@@ -1,0 +1,6 @@
+npx neonctl@latest init
+
+neon commond
+
+
+postgresql://neondb_owner:npg_n92oblavZpJs@ep-mute-surf-apzn026d.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require
