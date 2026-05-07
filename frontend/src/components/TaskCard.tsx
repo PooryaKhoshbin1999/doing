@@ -1,8 +1,94 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function TaskCard({ task }: any) {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import api from "../services/api";
+import { useState } from "react";
+
+const order = ["todo", "in-progress", "done"];
+
+export default function TaskCard({ task, refresh }: any) {
+  const [open, setOpen] = useState(false);
+
+  const moveNext = async () => {
+    const index = order.indexOf(task.status);
+    if (index === order.length - 1) return;
+
+    const newStatus = order[index + 1];
+
+    await api.patch(`/tasks/${task.id}/status`, {
+      status: newStatus,
+    });
+    refresh();
+  };
+
+  const movePrev = async () => {
+    const index = order.indexOf(task.status);
+    if (index === 0) return;
+
+    const newStatus = order[index - 1];
+
+    await api.patch(`/tasks/${task.id}/status`, {
+      status: newStatus,
+    });
+
+    refresh();
+  };
+
+  const remove = async () => {
+    await api.delete(`/tasks/${task.id}`);
+    refresh();
+  };
+
+  const edit = async () => {
+    const newTitle = prompt("New title:", task.title);
+    if (!newTitle) return;
+
+    await api.patch(`/tasks/${task.id}`, {
+      tittle: newTitle,
+    });
+
+    refresh();
+  };
+
   return (
-    <div className="bg-white p-3 rounded-lg shadow hover:shadow-md transition mb-2">
-      {task.title}
+    <div className="bg-white p-3 rounded-lg shadow mb-2 relative">
+      <div>{task.title}</div>
+      <button
+        className="absolute top-2 right-2 text-gray-500"
+        onClick={() => setOpen(!open)}
+      >
+        ...
+      </button>
+
+      {open && (
+        <div className="absolute right-2 top-8 bg-white shadow rounded w-40 z-10">
+          <button
+            onClick={moveNext}
+            className="block w-full text-left px-3 py-2 hover:bg-gray-100"
+          >
+            Move Next
+          </button>
+
+          <button
+            onClick={movePrev}
+            className="block w-full text-left px-3 py-2 hover:bg-gray-100"
+          >
+            Move prev
+          </button>
+
+          <button
+            onClick={edit}
+            className="block w-full text-left px-3 py-2 hover:bg-gray-100"
+          >
+            Edit
+          </button>
+
+          <button
+            onClick={remove}
+            className="block w-full text-left px-3 py-2 text-red-500 hover:bg-gray-100"
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }

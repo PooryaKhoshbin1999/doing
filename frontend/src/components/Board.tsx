@@ -12,8 +12,10 @@ export default function Board() {
     api.get("/tasks").then((res) => setTasks(res.data));
   };
 
-  useEffect(() => {}, []);
-  loadTasks();
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
   return (
     <div>
       <Navbar />
@@ -24,14 +26,17 @@ export default function Board() {
           <Column
             title="Todo"
             tasks={tasks.filter((t: any) => t.status === "todo")}
+            refresh={loadTasks}
           />
           <Column
             title="In Progress"
             tasks={tasks.filter((t: any) => t.status === "in-progress")}
+            refresh={loadTasks}
           />
           <Column
             title="Done"
             tasks={tasks.filter((t: any) => t.status === "done")}
+            refresh={loadTasks}
           />
         </div>
       </div>
