@@ -25,7 +25,9 @@ export default function CreateTask({ onCreated }: any) {
         value={title}
       />
 
-      <button className="bg-green-500 text-white px-4 rounded">Add</button>
+      <button className="bg-green-500 text-white px-4 rounded cursor-pointer">
+        Add
+      </button>
     </form>
   );
 }

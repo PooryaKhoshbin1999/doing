@@ -4,6 +4,7 @@ import api from "../services/api";
 import Column from "./Column";
 import Navbar from "./Navbar";
 import CreateTask from "./CreateTask";
+import { DndContext, type DragEndEvent } from "@dnd-kit/core";
 
 export default function Board() {
   const [tasks, setTasks] = useState([]);
@@ -16,29 +17,66 @@ export default function Board() {
     loadTasks();
   }, []);
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const taskId = active.id;
+    const newStatus = over.id;
+
+    let movedTask: any;
+
+    setTasks((prev: any[]) => {
+      const filtered = prev.filter((t) => {
+        if (t.id === taskId) {
+          movedTask = t;
+          return false;
+        }
+        return true;
+      });
+
+      const updatedTask = {
+        ...movedTask,
+        status: newStatus,
+      };
+
+      return [...filtered, updatedTask];
+    });
+
+    await api.patch(`/tasks/${taskId}/status`, {
+      status: newStatus,
+    });
+  };
+
   return (
     <div>
       <Navbar />
       <div className="p-4">
         <CreateTask onCreated={loadTasks} />
 
-        <div className="flex gap-6">
-          <Column
-            title="Todo"
-            tasks={tasks.filter((t: any) => t.status === "todo")}
-            refresh={loadTasks}
-          />
-          <Column
-            title="In Progress"
-            tasks={tasks.filter((t: any) => t.status === "in-progress")}
-            refresh={loadTasks}
-          />
-          <Column
-            title="Done"
-            tasks={tasks.filter((t: any) => t.status === "done")}
-            refresh={loadTasks}
-          />
-        </div>
+        <DndContext onDragEnd={handleDragEnd}>
+          <div className="flex gap-6">
+            <Column
+              title="Todo"
+              status="todo"
+              tasks={tasks.filter((t: any) => t.status === "todo")}
+              refresh={loadTasks}
+            />
+            <Column
+              title="In Progress"
+              status="in-progress"
+              tasks={tasks.filter((t: any) => t.status === "in-progress")}
+              refresh={loadTasks}
+            />
+            <Column
+              title="Done"
+              status="done"
+              tasks={tasks.filter((t: any) => t.status === "done")}
+              refresh={loadTasks}
+            />
+          </div>
+        </DndContext>
       </div>
     </div>
   );
