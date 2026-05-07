@@ -38,14 +38,19 @@ export default function TaskCard({ task, refresh }: any) {
   };
 
   const edit = async () => {
-    const newTitle = prompt("New title:", task.title);
-    if (!newTitle) return;
+    try {
+      const newTitle = prompt("New title:", task.title);
 
-    await api.patch(`/tasks/${task.id}`, {
-      tittle: newTitle,
-    });
+      if (!newTitle) return;
 
-    refresh();
+      await api.patch(`/tasks/${task.id}`, {
+        title: newTitle,
+      });
+
+      refresh();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

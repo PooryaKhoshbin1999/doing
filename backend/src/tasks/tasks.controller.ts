@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { TasksService } from './tasks.service';
 import {
   UseGuards,
@@ -12,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import type { TaskStatus } from './task.entity';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -20,13 +23,11 @@ export class TasksController {
 
   @Get()
   findAll(@Req() req: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     return this.tasksService.findAll(req.user.userId);
   }
 
   @Post()
   create(@Body() body: { title: string }, @Req() req: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     return this.tasksService.create(body, req.user.userId);
   }
 
@@ -36,13 +37,21 @@ export class TasksController {
     @Body('status') status: TaskStatus,
     @Req() req: any,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     return this.tasksService.updateStatus(+id, status, req.user.userId);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     return this.tasksService.remove(+id, req.user.userId);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  update(
+    @Param('id') id: string,
+    @Body() body: UpdateTaskDto,
+    @Req() req: any,
+  ) {
+    return this.tasksService.update(+id, body, req.user.userId);
   }
 }
