@@ -6,8 +6,14 @@ import Navbar from "./Navbar";
 import CreateTask from "./CreateTask";
 import { DndContext, type DragEndEvent } from "@dnd-kit/core";
 
+type Task = {
+  id: number;
+  title: string;
+  status: "todo" | "in-progress" | "done";
+};
+
 export default function Board() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const loadTasks = () => {
     api.get("/tasks").then((res) => setTasks(res.data));
@@ -27,7 +33,7 @@ export default function Board() {
 
     let movedTask: any;
 
-    setTasks((prev: any[]) => {
+    setTasks((prev: Task[]) => {
       const filtered = prev.filter((t) => {
         if (t.id === taskId) {
           movedTask = t;
